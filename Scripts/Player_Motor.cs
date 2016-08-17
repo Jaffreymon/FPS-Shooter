@@ -9,7 +9,7 @@ public class Player_Motor : MonoBehaviour {
 	private Vector3 velocity = Vector3.zero;
 	private Vector3 rotation = Vector3.zero;
 	private Vector3 camera_rotation = Vector3.zero;
-
+	private Vector3 jump_Vector = Vector3.zero;
 
 	private Rigidbody rb;
 
@@ -33,6 +33,10 @@ public class Player_Motor : MonoBehaviour {
 		camera_rotation = _camera_rotation;
 	}
 
+	public void JumpUp(Vector3 jumpHeight) {
+		jump_Vector = jumpHeight;
+	}
+
 	// Run every physics iteration
 	void FixedUpdate() {
 		PerformMovement();
@@ -43,6 +47,9 @@ public class Player_Motor : MonoBehaviour {
 	void PerformMovement() {
 		if (velocity != Vector3.zero) {
 			rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
+		}
+		if(jump_Vector != Vector3.zero) {
+			rb.AddForce (jump_Vector * Time.fixedDeltaTime);
 		}
 	}
 

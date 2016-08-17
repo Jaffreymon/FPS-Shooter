@@ -10,10 +10,24 @@ public class Player_Controller : MonoBehaviour {
 	[SerializeField]
 	private float lookSensitivity = 5f;
 
-	private Player_Motor motor; 
+	[SerializeField]
+	private float height = 5f;
+
+	// Checks if player is on the ground
+	public Transform ground;
+	public float groundRadius;
+	public LayerMask whatIsGround;
+	private bool grounded;
+
+
+	private Player_Motor motor;
 
 	void Start() {
 		motor = GetComponent<Player_Motor> ();
+	}
+
+	void FixedUpdate() {
+		grounded = Physics.OverlapSphere (ground.position, groundRadius, whatIsGround).Length != 0;
 	}
 
 	void Update() {
@@ -45,6 +59,10 @@ public class Player_Controller : MonoBehaviour {
 
 		// Apply camera rotation
 		motor.RotateCamera(_camera_rotation);
-	}
 
+		// Controls Player Jumping Control
+		if(Input.GetKeyDown(KeyCode.Space) && grounded) {
+			GetComponent<Rigidbody> ().velocity = new Vector3 (0, height, 0);
+		}
+	}
 }
