@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
+[RequireComponent(typeof(Player))]
 public class PlayerSetup : NetworkBehaviour {
 
 	// List of components to disable for spawned players
@@ -26,12 +27,15 @@ public class PlayerSetup : NetworkBehaviour {
 				sceneCamera.gameObject.SetActive (false);
 			}
 		}
-		RegisterPlayer ();
 	}
 
-	void RegisterPlayer() {
-		string _ID = "Player " + GetComponent<NetworkIdentity> ().netId;
-		transform.name = _ID;
+	public override void OnStartClient(){
+		base.OnStartClient ();
+
+		string _netID = GetComponent<NetworkIdentity>().netId.ToString();
+		Player _player = GetComponent<Player> ();
+
+		GameManager.RegisterPlayer (_netID, _player);
 	}
 
 	void AssignRemotePlayer() {
@@ -48,5 +52,7 @@ public class PlayerSetup : NetworkBehaviour {
 		if (sceneCamera != null) {
 			sceneCamera.gameObject.SetActive (true);
 		}
+
+		GameManager.DeRegisteredPlayer (transform.name);
 	}
 }

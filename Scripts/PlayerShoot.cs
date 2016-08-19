@@ -34,13 +34,14 @@ public class PlayerShoot : NetworkBehaviour {
 		// Checks valid shots
 		if(Physics.Raycast(cam.transform.position, cam.transform.forward, out _hit, weapon.range, mask)) {
 			if (_hit.collider.tag == Player_tag) {
-				CmdPlayerShot (_hit.collider.name);
+				CmdPlayerShot (_hit.collider.name, weapon.damage);
 			}
 		}
 	}
 
 	[Command]
-	void CmdPlayerShot(string _ID) {
-		Debug.Log (_ID + " was hit");
+	void CmdPlayerShot(string _playerID, int _damage) {
+		Player _player = GameManager.GetPlayer(_playerID);
+		_player.TakeDamage (_damage);
 	}
 }
