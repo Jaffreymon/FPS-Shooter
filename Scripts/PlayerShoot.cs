@@ -2,7 +2,7 @@
 using UnityEngine.Networking;
 
 public class PlayerShoot : NetworkBehaviour {
-
+	
 	public PlayerWeapon weapon;
 
 	private const string Player_tag = "Player";
@@ -30,6 +30,8 @@ public class PlayerShoot : NetworkBehaviour {
 	[Client]
 	void Shoot() {
 		RaycastHit _hit;
+
+		weapon.gunSound.
 
 		// Checks valid shots
 		if(Physics.Raycast(cam.transform.position, cam.transform.forward, out _hit, weapon.range, mask)) {

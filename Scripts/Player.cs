@@ -30,14 +30,14 @@ public class Player : NetworkBehaviour {
 		SetDefaults ();
 	}
 
-//	void Update() {
-//		if (!isLocalPlayer)
-//			return;
-//
-//		if (Input.GetKeyDown (KeyCode.K)) {
-//			RpcTakeDamage (1000);
-//		}
-//	}
+	void Update() {
+		if (!isLocalPlayer)
+			return;
+
+		if (Input.GetKeyDown (KeyCode.K)) {
+			RpcTakeDamage (1000);
+		}
+	}
 
 	[ClientRpc]
 	public void RpcTakeDamage(int _amount) {
