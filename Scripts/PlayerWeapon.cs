@@ -9,7 +9,8 @@ public class PlayerWeapon {
 	public int damage = 10;
 	public float range = 120f;
 
-	public AudioSource gunSound;
+	public GameObject graphics;
+	public float fireRate = 100f;
 
 	// TODO add weapon fire rate: semi, semi-auto, auto
 }

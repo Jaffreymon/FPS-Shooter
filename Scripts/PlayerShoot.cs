@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
+[RequireComponent(typeof(WeaponManager))]
 public class PlayerShoot : NetworkBehaviour {
-	
-	public PlayerWeapon weapon;
+
+	private PlayerWeapon currWeapon;
+	private WeaponManager weaponManager;
 
 	private const string Player_tag = "Player";
 	[SerializeField]
@@ -18,25 +20,35 @@ public class PlayerShoot : NetworkBehaviour {
 			Debug.LogError ("Player_Camera null reference!");
 			this.enabled = false;
 		}
+		weaponManager = GetComponent<WeaponManager> ();
 	}
 
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetButtonDown("Fire1")) {
-			Shoot();
+		currWeapon = weaponManager.getCurrWeapon ();
+		if (currWeapon.fireRate <= 0f) {
+			if (Input.GetButtonDown ("Fire1")) {
+				Shoot ();
+			}
+		} else {
+			if (Input.GetButtonDown ("Fire1")) {
+				InvokeRepeating ("Shoot", 0f, 1f/(currWeapon.fireRate));
+			}
+			else if(Input.GetButtonUp("Fire1")) {
+				CancelInvoke ("Shoot");
+			}
 		}
 	}
 
 	[Client]
 	void Shoot() {
+		Debug.Log ("SHOOT");
 		RaycastHit _hit;
-
-		weapon.gunSound.
-
+	
 		// Checks valid shots
-		if(Physics.Raycast(cam.transform.position, cam.transform.forward, out _hit, weapon.range, mask)) {
+		if(Physics.Raycast(cam.transform.position, cam.transform.forward, out _hit, currWeapon.range, mask)) {
 			if (_hit.collider.tag == Player_tag) {
-				CmdPlayerShot (_hit.collider.name, weapon.damage);
+				CmdPlayerShot (_hit.collider.name, currWeapon.damage);
 			}
 		}
 	}
