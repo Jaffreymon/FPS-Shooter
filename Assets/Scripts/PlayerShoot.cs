@@ -40,11 +40,30 @@ public class PlayerShoot : NetworkBehaviour {
 		}
 	}
 
+	// Called on server when player shoots
+	[Command]
+	void CmdOnShoot() {
+		RpcDoMuzzleFlash ();
+	}
+
+	// All clients call shooting effect for each shot
+	[ClientRpc]
+	void RpcDoMuzzleFlash() {
+		weaponManager.getCurrGraphics ().muzzleFlash.Play ();
+	}
+
 	[Client]
 	void Shoot() {
-		Debug.Log ("SHOOT");
+		// Only Local player can shoot from all players on server
+		if (!isLocalPlayer) {
+			return;
+		}
+
+		// Player is shooting, let server know
+		CmdOnShoot ();
+
 		RaycastHit _hit;
-	
+
 		// Checks valid shots
 		if(Physics.Raycast(cam.transform.position, cam.transform.forward, out _hit, currWeapon.range, mask)) {
 			if (_hit.collider.tag == Player_tag) {
