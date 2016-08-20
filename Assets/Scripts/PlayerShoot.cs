@@ -64,7 +64,7 @@ public class PlayerShoot : NetworkBehaviour {
 	[ClientRpc]
 	void RpcDoMuzzleFlash() {
 		weaponManager.getCurrGraphics ().muzzleFlash.Play ();
-
+		weaponManager.getGunSounds ().Play ();
 	}
 
 	[Client]
