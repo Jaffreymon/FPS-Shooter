@@ -64,5 +64,13 @@ public class Player_Controller : MonoBehaviour {
 		if(Input.GetKeyDown(KeyCode.Space) && grounded) {
 			GetComponent<Rigidbody> ().velocity = new Vector3 (0, height, 0);
 		}
+
+		// Handles Player Sprinting
+		if (Input.GetKeyDown (KeyCode.LeftShift)) {
+			speed *= 1.5f;
+		}
+		else if(Input.GetKeyUp (KeyCode.LeftShift)) {
+			speed /= 1.5f;
+		}
 	}
 }
