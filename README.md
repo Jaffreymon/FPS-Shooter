@@ -1,5 +1,6 @@
 # FPS-Shooter by Jeffrey Yen
-Unity 5.x FPS 
+Contact: jyen@ucsd.edu
+
  This repository includes all the assets of a multiplayer FPS game made by the Unity 5.3.5 engine. 
  A standalone application is not made.
  
