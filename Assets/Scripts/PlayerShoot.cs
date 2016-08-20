@@ -46,10 +46,25 @@ public class PlayerShoot : NetworkBehaviour {
 		RpcDoMuzzleFlash ();
 	}
 
+	// All clients call hitting effect for each shot
+	// Takes in the hit point and the normal vector of the surface
+	[Command]
+	void CmdOnHit(Vector3 _pos, Vector3 _normal) {
+		RpcDoHitEffect (_pos, _normal);
+	}
+
+	// Is called on all clients to emit particle effect of ray collision
+	[ClientRpc]
+	void RpcDoHitEffect(Vector3 _pos, Vector3 _normal) {
+		GameObject _hitEffect = (GameObject) Instantiate (weaponManager.getCurrGraphics().hitEffectPrefab, _pos, Quaternion.LookRotation (_normal));
+		Destroy (_hitEffect, 1.5f);
+	}
+
 	// All clients call shooting effect for each shot
 	[ClientRpc]
 	void RpcDoMuzzleFlash() {
 		weaponManager.getCurrGraphics ().muzzleFlash.Play ();
+
 	}
 
 	[Client]
@@ -69,6 +84,9 @@ public class PlayerShoot : NetworkBehaviour {
 			if (_hit.collider.tag == Player_tag) {
 				CmdPlayerShot (_hit.collider.name, currWeapon.damage);
 			}
+
+			// Show hit particles when a ray makes a collision
+			CmdOnHit (_hit.point, _hit.normal);
 		}
 	}
 
