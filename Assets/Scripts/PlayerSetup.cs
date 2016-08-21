@@ -2,6 +2,7 @@
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(Player))]
+[RequireComponent(typeof(PlayerController))]
 public class PlayerSetup : NetworkBehaviour {
 
 	// List of components to disable for spawned players
@@ -35,9 +36,14 @@ public class PlayerSetup : NetworkBehaviour {
 			playerUIInstance = Instantiate(playerUIPrefab);
 			playerUIInstance.name = playerUIPrefab.name;
 
+			// Configure PlayerUI
+			PlayerUI ui = playerUIInstance.GetComponent<PlayerUI>();
+			if (ui == null) {
+				Debug.LogError ("No PlayerUI component on PlayerUI Prefab");
+			}
+			ui.SetController(GetComponent<Player_Controller>());
 		}
-
-		GetComponent<Player>().Setup();
+ 		GetComponent<Player>().Setup();
 	}
 
 	public override void OnStartClient(){

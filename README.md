@@ -7,6 +7,7 @@ Contact: jyen@ucsd.edu
  List of implemented functions:
  - Player Controls:
     - WASD Movement
+    - Sprinting (Forward Only)
     - Camera Movement
     - Jumping
     
@@ -23,7 +24,6 @@ Contact: jyen@ucsd.edu
  
  Goals:
   - Limited Ammunition system
-  - Player Running Capabilities
   - Reload Animation
   - Recoil Animation
 

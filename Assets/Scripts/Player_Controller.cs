@@ -4,14 +4,22 @@
 
 public class Player_Controller : MonoBehaviour {
 
-	[SerializeField]
-	private float speed = 5f;
+	private const float walking = 3f;
+	private const float running = 5f;
+	private float speed = walking;
 
 	[SerializeField]
-	private float lookSensitivity = 5f;
+	private float lookSensitivity = 4f;
 
 	[SerializeField]
-	private float height = 5f;
+	private float height = 3.2f;
+
+	[SerializeField]
+	private float stamina = 1f;
+	[SerializeField]
+	private float staminaUse = 0.5f;
+	[SerializeField]
+	private float staminaRegen = 0.3f;
 
 	// Checks if player is on the ground
 	public Transform ground;
@@ -21,6 +29,10 @@ public class Player_Controller : MonoBehaviour {
 
 
 	private Player_Motor motor;
+
+	public float getStamina() {
+		return stamina;
+	}
 
 	void Start() {
 		motor = GetComponent<Player_Motor> ();
@@ -66,11 +78,16 @@ public class Player_Controller : MonoBehaviour {
 		}
 
 		// Handles Player Sprinting
-		if (Input.GetKeyDown (KeyCode.LeftShift)) {
-			speed *= 1.5f;
+		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.W) && stamina > 0) {
+			stamina -= staminaUse * Time.deltaTime;
+			if (stamina >= 0.1f) {
+				speed = running;
+			}
 		}
-		else if(Input.GetKeyUp (KeyCode.LeftShift)) {
-			speed /= 1.5f;
+		else {
+			stamina += staminaRegen* Time.deltaTime;
+			speed = walking;
 		}
+		stamina = Mathf.Clamp (stamina, 0f, 1f);
 	}
 }
