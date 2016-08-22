@@ -4,7 +4,9 @@ using UnityEngine.Networking;
 [RequireComponent(typeof(WeaponManager))]
 public class PlayerShoot : NetworkBehaviour {
 
+	[SerializeField]
 	private PlayerWeapon currWeapon;
+	[SerializeField]
 	private WeaponManager weaponManager;
 
 	private const string Player_tag = "Player";
@@ -25,18 +27,27 @@ public class PlayerShoot : NetworkBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		currWeapon = weaponManager.getCurrWeapon ();
-		if (currWeapon.fireRate <= 0f) {
-			if (Input.GetButtonDown ("Fire1")) {
-				Shoot ();
+		// Constant update on what gun the player has
+			currWeapon = weaponManager.getCurrWeapon ();
+
+			// Player Shoots semi-auto
+			if (currWeapon.fireRate < 0f) {
+				if (Input.GetButtonDown ("Fire1")) {
+					Shoot ();
+				}
+			} 
+			// Player shoots full auto
+			else {
+				if (Input.GetButtonDown ("Fire1")) {
+					InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.fireRate));
+				} else if (Input.GetButtonUp ("Fire1")) {
+					CancelInvoke ("Shoot");
+				}
 			}
-		} else {
-			if (Input.GetButtonDown ("Fire1")) {
-				InvokeRepeating ("Shoot", 0f, 1f/(currWeapon.fireRate));
-			}
-			else if(Input.GetButtonUp("Fire1")) {
-				CancelInvoke ("Shoot");
-			}
+
+		// Player Reloads
+		if (Input.GetKeyDown (KeyCode.R)) {
+			currWeapon.clipSize = currWeapon.getMaxClipSize ();
 		}
 	}
 
@@ -74,6 +85,10 @@ public class PlayerShoot : NetworkBehaviour {
 			return;
 		}
 
+		// If gun surpasses max clipSize, don't shoot
+		if(currWeapon.clipSize < 1) {
+			return;
+		}
 		// Player is shooting, let server know
 		CmdOnShoot ();
 
@@ -88,6 +103,8 @@ public class PlayerShoot : NetworkBehaviour {
 			// Show hit particles when a ray makes a collision
 			CmdOnHit (_hit.point, _hit.normal);
 		}
+
+		currWeapon.clipSize--;
 	}
 
 	[Command]
