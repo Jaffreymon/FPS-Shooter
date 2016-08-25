@@ -13,9 +13,11 @@ public class WeaponManager : NetworkBehaviour {
 	[SerializeField]
 	private Transform weaponHolder;
 
+	[SerializeField]
 	private WeaponGraphics currGraphics;
+
+	[SerializeField]
 	private PlayerWeapon currWeapon;
-	private AudioSource gunSounds;
 
 	// Use this for initialization
 	void Start () {
@@ -29,25 +31,20 @@ public class WeaponManager : NetworkBehaviour {
 		_weaponIns.transform.SetParent (weaponHolder);
 
 		currGraphics = _weaponIns.GetComponent<WeaponGraphics> ();
-		gunSounds = _weaponIns.GetComponent<AudioSource> ();
 		if (currGraphics == null) {
 			Debug.LogError ("No Weapon Graphics on weapon " + _weaponIns.name);
 		}
-
-		//if (isLocalPlayer) {
+			
 		Util.SetLayerRecursive (_weaponIns, LayerMask.NameToLayer(weaponLayerName));
-		//}
 	}
 
 	public WeaponGraphics getCurrGraphics() {
 		return currGraphics;
 	}
 
-	public AudioSource getGunSounds() {
-		return gunSounds;
-	}
-
 	public PlayerWeapon getCurrWeapon() {
 		return currWeapon;
 	}
+
+
 }

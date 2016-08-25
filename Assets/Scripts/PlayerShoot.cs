@@ -68,14 +68,18 @@ public class PlayerShoot : NetworkBehaviour {
 	[ClientRpc]
 	void RpcDoHitEffect(Vector3 _pos, Vector3 _normal) {
 		GameObject _hitEffect = (GameObject) Instantiate (weaponManager.getCurrGraphics().hitEffectPrefab, _pos, Quaternion.LookRotation (_normal));
-		Destroy (_hitEffect, 1.5f);
+		Destroy (_hitEffect, 1.1f);
 	}
 
 	// All clients call shooting effect for each shot
 	[ClientRpc]
 	void RpcDoMuzzleFlash() {
 		weaponManager.getCurrGraphics ().muzzleFlash.Play ();
-		weaponManager.getGunSounds ().Play ();
+		weaponManager.getCurrWeapon ().playShootSound (cam.transform.position);
+		if (Time.time > weaponManager.getCurrGraphics().rate_time) {
+			weaponManager.getCurrGraphics().rate_time = Time.time + weaponManager.getCurrGraphics().rate;
+			weaponManager.getCurrGraphics().playRecoil ();
+		}
 	}
 
 	[Client]
@@ -85,10 +89,12 @@ public class PlayerShoot : NetworkBehaviour {
 			return;
 		}
 
-		// If gun surpasses max clipSize, don't shoot
+		// If gun has 0 clipSize, it's empty
 		if(currWeapon.clipSize < 1) {
+			currWeapon.playEmptyClick (cam.transform.position);
 			return;
 		}
+
 		// Player is shooting, let server know
 		CmdOnShoot ();
 
