@@ -14,6 +14,11 @@ public class PlayerShoot : NetworkBehaviour {
 	private Camera cam;
 
 	[SerializeField]
+	private GameObject audioSource;
+
+	private WeaponGraphics currGraphics;
+
+	[SerializeField]
 	private LayerMask mask;
 
 	// Use this for initialization
@@ -23,31 +28,41 @@ public class PlayerShoot : NetworkBehaviour {
 			this.enabled = false;
 		}
 		weaponManager = GetComponent<WeaponManager> ();
+		currGraphics = weaponManager.getCurrGraphics ();
 	}
 
 	// Update is called once per frame
 	void Update () {
 		// Constant update on what gun the player has
-			currWeapon = weaponManager.getCurrWeapon ();
+		currWeapon = weaponManager.getCurrWeapon ();
+		currGraphics = weaponManager.getCurrGraphics ();
 
-			// Player Shoots semi-auto
-			if (currWeapon.fireRate < 0f) {
-				if (Input.GetButtonDown ("Fire1")) {
-					Shoot ();
-				}
-			} 
-			// Player shoots full auto
-			else {
-				if (Input.GetButtonDown ("Fire1")) {
-					InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.fireRate));
-				} else if (Input.GetButtonUp ("Fire1")) {
-					CancelInvoke ("Shoot");
-				}
+		// Player Shoots semi-auto
+		if (currWeapon.fireRate < 0f) {
+			if (Input.GetButtonDown ("Fire1")) {
+				Shoot ();
 			}
+		} 
+		// Player shoots full auto
+		else {
+			if (Input.GetButtonDown ("Fire1")) {
+				InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.fireRate));
+			} else if (Input.GetButtonUp ("Fire1")) {
+				CancelInvoke ("Shoot");
+			}
+		}
 
-		// Player Reloads
-		if (Input.GetKeyDown (KeyCode.R)) {
+		// Player Moves
+		if(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.D)) {
+			currGraphics.playWalk ();
+		} else {
+			currGraphics.playIdle();
+		}
+
+		// Player Reloads when magazine is not full
+		if (Input.GetKeyDown (KeyCode.R) && currWeapon.clipSize != currWeapon.getMaxClipSize()) {
 			currWeapon.clipSize = currWeapon.getMaxClipSize ();
+			weaponManager.getCurrGraphics ().playReload ();
 		}
 	}
 
@@ -75,7 +90,7 @@ public class PlayerShoot : NetworkBehaviour {
 	[ClientRpc]
 	void RpcDoMuzzleFlash() {
 		weaponManager.getCurrGraphics ().muzzleFlash.Play ();
-		weaponManager.getCurrWeapon ().playShootSound (cam.transform.position);
+		weaponManager.getCurrWeapon ().playShootSound (audioSource.transform.position);
 		if (Time.time > weaponManager.getCurrGraphics().rate_time) {
 			weaponManager.getCurrGraphics().rate_time = Time.time + weaponManager.getCurrGraphics().rate;
 			weaponManager.getCurrGraphics().playRecoil ();
@@ -91,7 +106,7 @@ public class PlayerShoot : NetworkBehaviour {
 
 		// If gun has 0 clipSize, it's empty
 		if(currWeapon.clipSize < 1) {
-			currWeapon.playEmptyClick (cam.transform.position);
+			currWeapon.playEmptyClick (audioSource.transform.position);
 			return;
 		}
 

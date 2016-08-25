@@ -9,6 +9,7 @@ public class WeaponGraphics : MonoBehaviour {
 	public AnimationClip walk;
 	public AnimationClip idle;
 	public AnimationClip recoil;
+	public AnimationClip reload;
 
 	public float rate_time = 0f;
 	public float rate = 0.1f;
@@ -16,16 +17,16 @@ public class WeaponGraphics : MonoBehaviour {
 
 	// TODO Animation: Run, Shoot
 
-	void Update() {
-		if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) {
-			playAnim (walk.name);
-		} else {
-			playAnim (idle.name);
-		}
+	void Start() {
+		am [reload.name].layer = 1;
 	}
 
-	public void playAnim( string animName) {
-		am.CrossFade(animName);
+	public void playWalk() {
+		am.CrossFade(walk.name);
+	}
+
+	public void playIdle() {
+		am.CrossFade(idle.name);
 	}
 
 	public void stopAnim() {
@@ -35,5 +36,10 @@ public class WeaponGraphics : MonoBehaviour {
 	public void playRecoil() {
 		am.Stop ();
 		am.Play(recoil.name);
+	}
+
+	public void playReload() {
+		am.Stop ();
+		am.Play (reload.name, PlayMode.StopAll);
 	}
 }
