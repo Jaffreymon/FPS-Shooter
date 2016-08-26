@@ -17,6 +17,7 @@ public class PlayerWeapon {
 	/* Array of AudioClips to be played
 	 * Elem 0: EmptyCLick
 	 * Elem 1: Shooting
+	 * Elem 2: Reload
 	 */ 
 	private AudioClip[] sounds;
 
@@ -38,7 +39,11 @@ public class PlayerWeapon {
 	}
 
 	public void playShootSound(Vector3 _pos) {
-		_pos.z += 1f;
+		//_pos.z += 1f;
 		AudioSource.PlayClipAtPoint (sounds[1], _pos);
+	}
+
+	public void playReloadSound(Vector3 _pos) {
+		AudioSource.PlayClipAtPoint (sounds[2], _pos);
 	}
 }

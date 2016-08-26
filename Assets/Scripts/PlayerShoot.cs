@@ -37,6 +37,7 @@ public class PlayerShoot : NetworkBehaviour {
 		currWeapon = weaponManager.getCurrWeapon ();
 		currGraphics = weaponManager.getCurrGraphics ();
 
+		// Players can't shoot if reloading
 		if (!currGraphics.am.IsPlaying("Reload")) {
 			// Player Shoots semi-auto
 			if (currWeapon.fireRate < 0f) {
@@ -65,6 +66,7 @@ public class PlayerShoot : NetworkBehaviour {
 		if (Input.GetKeyDown (KeyCode.R) && currWeapon.clipSize != currWeapon.getMaxClipSize()) {
 			currWeapon.clipSize = currWeapon.getMaxClipSize ();
 			weaponManager.getCurrGraphics ().playReload ();
+			currWeapon.playReloadSound (audioSource.transform.position);
 		}
 	}
 
