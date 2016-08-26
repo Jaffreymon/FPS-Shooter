@@ -131,7 +131,6 @@ public class PlayerShoot : NetworkBehaviour {
 		}
 
 		currWeapon.clipSize--;
-		Debug.Log (currWeapon.clipSize);
 	}
 
 	[Command]

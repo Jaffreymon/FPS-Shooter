@@ -20,6 +20,10 @@ public class Player : NetworkBehaviour {
 	private Behaviour[] disableOnDeath;
 	private bool[] wasEnable;
 
+	public int getHealth() {
+		return currHealth;
+	}
+
 	public void Setup () {
 		wasEnable = new bool[disableOnDeath.Length];
 
@@ -35,7 +39,7 @@ public class Player : NetworkBehaviour {
 			return;
 
 		if (Input.GetKeyDown (KeyCode.K)) {
-			RpcTakeDamage (1000);
+			RpcTakeDamage (20);
 		}
 	}
 

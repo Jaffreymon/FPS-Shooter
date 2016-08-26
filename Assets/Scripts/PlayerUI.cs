@@ -7,9 +7,13 @@ public class PlayerUI : MonoBehaviour {
 	private RectTransform staminaFill;
 
 	[SerializeField]
+	private Text healthCount;
+
+	[SerializeField]
 	private Player_Controller controller;
 
 	private WeaponManager weaponHandler;
+	private Player playerHandler;
 
 	[SerializeField]
 	private Text ammoCount;
@@ -20,6 +24,7 @@ public class PlayerUI : MonoBehaviour {
 
 	// Links UIPrefab with in-scene player
 	public void SetPlayer(Player _player) {
+		playerHandler = _player;
 		weaponHandler = _player.GetComponent<WeaponManager>();
 	}
 
@@ -27,13 +32,18 @@ public class PlayerUI : MonoBehaviour {
 		staminaFill.localScale = new Vector3(1f, _amount, 1f);
 	}
 
-	public void setAmmoCount (int _totAmmo) {
+	public void SetAmmoCount (int _totAmmo) {
 		ammoCount.text = "Ammo: " + _totAmmo;
+	}
+
+	public void SetHealth(int _health) {
+		healthCount.text = "Health: " + _health;
 	}
 
 	void Update() {
 		SetStamina(controller.getStamina ());
-		setAmmoCount(weaponHandler.getCurrWeapon().clipSize);
+		SetAmmoCount(weaponHandler.getCurrWeapon().clipSize);
+		SetHealth (playerHandler.getHealth ());
 	}
 		
 }
