@@ -37,18 +37,20 @@ public class PlayerShoot : NetworkBehaviour {
 		currWeapon = weaponManager.getCurrWeapon ();
 		currGraphics = weaponManager.getCurrGraphics ();
 
-		// Player Shoots semi-auto
-		if (currWeapon.fireRate < 0f) {
-			if (Input.GetButtonDown ("Fire1")) {
-				Shoot ();
-			}
-		} 
+		if (!currGraphics.am.IsPlaying("Reload")) {
+			// Player Shoots semi-auto
+			if (currWeapon.fireRate < 0f) {
+				if (Input.GetButtonDown ("Fire1")) {
+					Shoot ();
+				}
+			} 
 		// Player shoots full auto
 		else {
-			if (Input.GetButtonDown ("Fire1")) {
-				InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.fireRate));
-			} else if (Input.GetButtonUp ("Fire1")) {
-				CancelInvoke ("Shoot");
+				if (Input.GetButtonDown ("Fire1")) {
+					InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.fireRate));
+				} else if (Input.GetButtonUp ("Fire1")) {
+					CancelInvoke ("Shoot");
+				}
 			}
 		}
 
