@@ -39,7 +39,6 @@ public class PlayerWeapon {
 	}
 
 	public void playShootSound(Vector3 _pos) {
-		//_pos.z += 1f;
 		AudioSource.PlayClipAtPoint (sounds[1], _pos);
 	}
 

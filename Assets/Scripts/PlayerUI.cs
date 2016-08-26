@@ -9,8 +9,7 @@ public class PlayerUI : MonoBehaviour {
 	[SerializeField]
 	private Player_Controller controller;
 
-	[SerializeField]
-	private PlayerWeapon currWeapon;
+	private WeaponManager weaponHandler;
 
 	[SerializeField]
 	private Text ammoCount;
@@ -19,13 +18,22 @@ public class PlayerUI : MonoBehaviour {
 		controller = _controller;
 	}
 
+	// Links UIPrefab with in-scene player
+	public void SetPlayer(Player _player) {
+		weaponHandler = _player.GetComponent<WeaponManager>();
+	}
+
 	void SetStamina(float _amount) {
 		staminaFill.localScale = new Vector3(1f, _amount, 1f);
 	}
 
+	public void setAmmoCount (int _totAmmo) {
+		ammoCount.text = "Ammo: " + _totAmmo;
+	}
+
 	void Update() {
 		SetStamina(controller.getStamina ());
-		//ammoCount.text = "Ammo: " + currWeapon.clipSize.ToString ();
+		setAmmoCount(weaponHandler.getCurrWeapon().clipSize);
 	}
 		
 }

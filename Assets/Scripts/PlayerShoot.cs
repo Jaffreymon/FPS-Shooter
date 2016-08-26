@@ -6,6 +6,7 @@ public class PlayerShoot : NetworkBehaviour {
 
 	[SerializeField]
 	private PlayerWeapon currWeapon;
+
 	[SerializeField]
 	private WeaponManager weaponManager;
 
@@ -130,6 +131,7 @@ public class PlayerShoot : NetworkBehaviour {
 		}
 
 		currWeapon.clipSize--;
+		Debug.Log (currWeapon.clipSize);
 	}
 
 	[Command]
