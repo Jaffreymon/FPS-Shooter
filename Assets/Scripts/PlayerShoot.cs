@@ -2,6 +2,7 @@
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(WeaponManager))]
+[RequireComponent(typeof(Player_Controller))]
 public class PlayerShoot : NetworkBehaviour {
 
 	[SerializeField]
@@ -18,6 +19,9 @@ public class PlayerShoot : NetworkBehaviour {
 	private GameObject audioSource;
 
 	private WeaponGraphics currGraphics;
+
+	[SerializeField]
+	private Player_Controller playerHandler;
 
 	[SerializeField]
 	private LayerMask mask;
@@ -38,6 +42,11 @@ public class PlayerShoot : NetworkBehaviour {
 		currWeapon = weaponManager.getCurrWeapon ();
 		currGraphics = weaponManager.getCurrGraphics ();
 
+		// If Player isn't running, stop sprint anim
+		if(playerHandler.isRunning == false) {
+			currGraphics.playWalk ();
+		}
+
 		// Players can't shoot if reloading
 		if (!currGraphics.am.IsPlaying("Reload")) {
 			// Player Shoots semi-auto
@@ -55,19 +64,24 @@ public class PlayerShoot : NetworkBehaviour {
 				}
 			}
 		}
-
+			
 		// Player Moves
-		if(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.D)) {
+		if (playerHandler.isRunning) {
+			currGraphics.playSprint();
+		}
+		else if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) ||
+			Input.GetKey(KeyCode.D) ) {
 			currGraphics.playWalk ();
-		} else {
+		} 
+		else {
 			currGraphics.playIdle();
 		}
 
 		// Player Reloads when magazine is not full
 		if (Input.GetKeyDown (KeyCode.R) && currWeapon.clipSize != currWeapon.getMaxClipSize()) {
-			currWeapon.clipSize = currWeapon.getMaxClipSize ();
 			weaponManager.getCurrGraphics ().playReload ();
 			currWeapon.playReloadSound (audioSource.transform.position);
+			currWeapon.clipSize = currWeapon.getMaxClipSize ();
 		}
 	}
 
@@ -97,7 +111,7 @@ public class PlayerShoot : NetworkBehaviour {
 		weaponManager.getCurrGraphics ().muzzleFlash.Play ();
 		weaponManager.getCurrWeapon ().playShootSound (audioSource.transform.position);
 		if (Time.time > weaponManager.getCurrGraphics().rate_time) {
-			weaponManager.getCurrGraphics().rate_time = Time.time + weaponManager.getCurrGraphics().rate;
+			weaponManager.getCurrGraphics().rate_time = Time.time + weaponManager.getCurrGraphics().recoilRateTime;
 			weaponManager.getCurrGraphics().playRecoil ();
 		}
 	}

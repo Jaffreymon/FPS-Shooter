@@ -26,6 +26,7 @@ public class Player_Controller : MonoBehaviour {
 	public float groundRadius;
 	public LayerMask whatIsGround;
 	private bool grounded;
+	public bool isRunning = false;
 
 
 	private Player_Motor motor;
@@ -43,7 +44,6 @@ public class Player_Controller : MonoBehaviour {
 	}
 
 	void Update() {
-		
 		// Calculate movement velocity as a 3D vector
 		float _xMovement = Input.GetAxisRaw("Horizontal");
 		float _zMovement = Input.GetAxisRaw ("Vertical");
@@ -79,6 +79,7 @@ public class Player_Controller : MonoBehaviour {
 
 		// Handles Player Sprinting
 		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.W) && stamina > 0) {
+			isRunning = true;
 			stamina -= staminaUse * Time.deltaTime;
 			if (stamina >= 0.1f) {
 				speed = running;
@@ -87,6 +88,7 @@ public class Player_Controller : MonoBehaviour {
 		else {
 			stamina += staminaRegen* Time.deltaTime;
 			speed = walking;
+			isRunning = false;
 		}
 		stamina = Mathf.Clamp (stamina, 0f, 1f);
 	}

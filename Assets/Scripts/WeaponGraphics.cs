@@ -10,9 +10,10 @@ public class WeaponGraphics : MonoBehaviour {
 	public AnimationClip idle;
 	public AnimationClip recoil;
 	public AnimationClip reload;
+	public AnimationClip sprinting;
 
 	public float rate_time = 0f;
-	public float rate = 0.1f;
+	public float recoilRateTime = 0.1f;
 
 
 	// TODO Animation: Run
@@ -36,6 +37,10 @@ public class WeaponGraphics : MonoBehaviour {
 	public void playRecoil() {
 		am.Stop ();
 		am.Play(recoil.name);
+	}
+
+	public void playSprint() {
+		am.CrossFade (sprinting.name);
 	}
 
 	public void playReload() {
