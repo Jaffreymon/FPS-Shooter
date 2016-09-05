@@ -15,9 +15,6 @@ public class WeaponGraphics : MonoBehaviour {
 	public float rate_time = 0f;
 	public float recoilRateTime = 0.1f;
 
-
-	// TODO Animation: Run
-
 	void Start() {
 		am [reload.name].layer = 1;
 	}

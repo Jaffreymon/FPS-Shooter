@@ -26,6 +26,8 @@ public class PlayerShoot : NetworkBehaviour {
 	[SerializeField]
 	private LayerMask mask;
 
+	private bool isShooting = false;
+
 	// Use this for initialization
 	void Start () {
 		if (cam == null) {
@@ -52,20 +54,30 @@ public class PlayerShoot : NetworkBehaviour {
 			// Player Shoots semi-auto
 			if (currWeapon.fireRate < 0f) {
 				if (Input.GetButtonDown ("Fire1")) {
+					isShooting = true;
 					Shoot ();
 				}
 			} 
-		// Player shoots full auto
-		else {
-				if (Input.GetButtonDown ("Fire1")) {
-					InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.fireRate));
-				} else if (Input.GetButtonUp ("Fire1")) {
-					CancelInvoke ("Shoot");
+			// Player shoots full auto
+			else {
+					if (Input.GetButtonDown ("Fire1")) {
+						InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.fireRate));
+						isShooting = true;
+					} else if (Input.GetButtonUp ("Fire1")) {
+						CancelInvoke ("Shoot");
+						isShooting = false;
+					}
 				}
-			}
+		}
+
+		// Player Reloads when magazine is not full
+		if (!isShooting && Input.GetKeyDown (KeyCode.R) && currWeapon.clipSize != currWeapon.getMaxClipSize()) {
+			weaponManager.getCurrGraphics ().playReload ();
+			currWeapon.playReloadSound (audioSource.transform.position);
+			currWeapon.clipSize = currWeapon.getMaxClipSize ();
 		}
 			
-		// Player Moves
+		// Player Movement Anims
 		if (playerHandler.isRunning) {
 			currGraphics.playSprint();
 		}
@@ -75,13 +87,6 @@ public class PlayerShoot : NetworkBehaviour {
 		} 
 		else {
 			currGraphics.playIdle();
-		}
-
-		// Player Reloads when magazine is not full
-		if (Input.GetKeyDown (KeyCode.R) && currWeapon.clipSize != currWeapon.getMaxClipSize()) {
-			weaponManager.getCurrGraphics ().playReload ();
-			currWeapon.playReloadSound (audioSource.transform.position);
-			currWeapon.clipSize = currWeapon.getMaxClipSize ();
 		}
 	}
 
