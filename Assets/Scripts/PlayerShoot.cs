@@ -49,10 +49,10 @@ public class PlayerShoot : NetworkBehaviour {
 			currGraphics.playWalk ();
 		}
 
-		// Players can't shoot if reloading
+		// Checks if player is reloading to prevent shooting
 		if (!currGraphics.am.IsPlaying("Reload")) {
 			// Player Shoots semi-auto
-			if (currWeapon.fireRate < 0f) {
+			if (currWeapon.tmpRate < 0f) {
 				if (Input.GetButtonDown ("Fire1")) {
 					isShooting = true;
 					Shoot ();
@@ -60,14 +60,14 @@ public class PlayerShoot : NetworkBehaviour {
 			} 
 			// Player shoots full auto
 			else {
-					if (Input.GetButtonDown ("Fire1")) {
-						InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.fireRate));
-						isShooting = true;
-					} else if (Input.GetButtonUp ("Fire1")) {
-						CancelInvoke ("Shoot");
-						isShooting = false;
-					}
+				if (Input.GetButtonDown ("Fire1")) {
+					InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.tmpRate));
+					isShooting = true;
+				} else if (Input.GetButtonUp ("Fire1")) {
+					CancelInvoke ("Shoot");
+					isShooting = false;
 				}
+			}
 		}
 
 		// Player Reloads when magazine is not full
@@ -81,12 +81,19 @@ public class PlayerShoot : NetworkBehaviour {
 		if (playerHandler.isRunning) {
 			currGraphics.playSprint();
 		}
+		// Player walking anim
 		else if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) ||
 			Input.GetKey(KeyCode.D) ) {
 			currGraphics.playWalk ();
 		} 
+		// Player default idle anim
 		else {
 			currGraphics.playIdle();
+		}
+
+		// Player toggles fire mode
+		if(Input.GetKeyDown(KeyCode.V)) {
+			currWeapon.change_fireRate ();
 		}
 	}
 

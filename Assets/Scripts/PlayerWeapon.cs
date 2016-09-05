@@ -22,7 +22,8 @@ public class PlayerWeapon {
 	private AudioClip[] sounds;
 
 	public GameObject graphics;
-	public float fireRate = 100f;
+	private const float fireRate = 10f;
+	public float tmpRate = fireRate;
 
 	// TODO add weapon fire rate: semi, semi-auto, auto
 
@@ -32,6 +33,14 @@ public class PlayerWeapon {
 
 	public float getReloadTime() {
 		return reloadTime;
+	}
+
+	public void change_fireRate() {
+		if (tmpRate != 0f) {
+			tmpRate = 0f;
+		} else {
+			tmpRate = fireRate;
+		}
 	}
 
 	public void playEmptyClick(Vector3 _pos) {

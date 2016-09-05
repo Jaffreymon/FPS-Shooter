@@ -5,6 +5,7 @@ using System.Collections;
 public class Player : NetworkBehaviour {
 	[SyncVar]
 	private bool _isDead = false;
+
 	public bool isDead  {
 		get { return _isDead; }
 		protected set{ _isDead = value; }
@@ -20,8 +21,14 @@ public class Player : NetworkBehaviour {
 	private Behaviour[] disableOnDeath;
 	private bool[] wasEnable;
 
+	private RectTransform playerPos;
+
 	public int getHealth() {
 		return currHealth;
+	}
+
+	public void Start() {
+		playerPos = GetComponentInParent<RectTransform>();
 	}
 
 	public void Setup () {
@@ -38,9 +45,12 @@ public class Player : NetworkBehaviour {
 		if (!isLocalPlayer)
 			return;
 
-		if (Input.GetKeyDown (KeyCode.K)) {
+		if (Input.GetKeyDown (KeyCode.K))
 			RpcTakeDamage (20);
-		}
+
+		// Checks if player fell off the map
+		if (playerPos.position.y <= -3)
+			Die ();
 	}
 
 	[ClientRpc]
