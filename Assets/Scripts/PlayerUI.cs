@@ -17,8 +17,6 @@ public class PlayerUI : MonoBehaviour {
 
 	[SerializeField]
 	private Text ammoCount;
-	[SerializeField]
-	private Text fireMode;
 
 	public void SetController(Player_Controller _controller) {
 		controller = _controller;
@@ -34,14 +32,6 @@ public class PlayerUI : MonoBehaviour {
 		staminaFill.localScale = new Vector3(1f, _amount, 1f);
 	}
 
-	void SetFireMode() {
-		if (weaponHandler.getCurrWeapon ().tmpRate == 0) {
-			fireMode.text = "S";
-		} else {
-			fireMode.text = "F";
-		}
-	}
-
 	public void SetAmmoCount (int _totAmmo) {
 		ammoCount.text = "Ammo: " + _totAmmo;
 	}
@@ -53,7 +43,6 @@ public class PlayerUI : MonoBehaviour {
 	void Update() {
 		SetStamina(controller.getStamina ());
 		SetAmmoCount(weaponHandler.getCurrWeapon().clipSize);
-		SetFireMode ();
 		SetHealth (playerHandler.getHealth ());
 	}
 		

@@ -26,6 +26,7 @@ public class PlayerShoot : NetworkBehaviour {
 	[SerializeField]
 	private LayerMask mask;
 
+	// Boolean to watch behavior of reloading during shooting
 	private bool isShooting = false;
 
 	// Use this for initialization
@@ -51,22 +52,12 @@ public class PlayerShoot : NetworkBehaviour {
 
 		// Checks if player is reloading to prevent shooting
 		if (!currGraphics.am.IsPlaying("Reload")) {
-			// Player Shoots semi-auto
-			if (currWeapon.tmpRate < 0f) {
-				if (Input.GetButtonDown ("Fire1")) {
-					isShooting = true;
-					Shoot ();
-				}
-			} 
-			// Player shoots full auto
-			else {
-				if (Input.GetButtonDown ("Fire1")) {
-					InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.tmpRate));
-					isShooting = true;
-				} else if (Input.GetButtonUp ("Fire1")) {
-					CancelInvoke ("Shoot");
-					isShooting = false;
-				}
+			if (Input.GetButtonDown ("Fire1")) {
+				InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.tmpRate));
+				isShooting = true;
+			} else if (Input.GetButtonUp ("Fire1")) {
+				CancelInvoke ("Shoot");
+				isShooting = false;
 			}
 		}
 
@@ -89,11 +80,6 @@ public class PlayerShoot : NetworkBehaviour {
 		// Player default idle anim
 		else {
 			currGraphics.playIdle();
-		}
-
-		// Player toggles fire mode
-		if(Input.GetKeyDown(KeyCode.V)) {
-			currWeapon.change_fireRate ();
 		}
 	}
 
