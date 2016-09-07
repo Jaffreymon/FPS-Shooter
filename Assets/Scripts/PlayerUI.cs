@@ -17,6 +17,8 @@ public class PlayerUI : MonoBehaviour {
 
 	[SerializeField]
 	private Text ammoCount;
+	[SerializeField]
+	private GameObject crosshair;
 
 	public void SetController(Player_Controller _controller) {
 		controller = _controller;
@@ -44,6 +46,14 @@ public class PlayerUI : MonoBehaviour {
 		SetStamina(controller.getStamina ());
 		SetAmmoCount(weaponHandler.getCurrWeapon().clipSize);
 		SetHealth (playerHandler.getHealth ());
+
+		if (Input.GetKeyDown (KeyCode.Mouse1)) {
+			crosshair.SetActive (false);
+		}
+		else if(Input.GetKeyUp(KeyCode.Mouse1)) {
+			crosshair.SetActive (true);
+		}
+
 	}
 		
 }

@@ -14,6 +14,10 @@ public class PlayerShoot : NetworkBehaviour {
 	private const string Player_tag = "Player";
 	[SerializeField]
 	private Camera cam;
+	[SerializeField]
+	private Transform weaponPos;
+	private Vector3 tmpWeaponPos;
+	private Vector3 ADSWeaponPos = new Vector3 (0f, -0.4f, 0.7f);
 
 	[SerializeField]
 	private GameObject audioSource;
@@ -37,6 +41,7 @@ public class PlayerShoot : NetworkBehaviour {
 		}
 		weaponManager = GetComponent<WeaponManager> ();
 		currGraphics = weaponManager.getCurrGraphics ();
+		tmpWeaponPos = weaponPos.localPosition;
 	}
 
 	// Update is called once per frame
@@ -80,6 +85,13 @@ public class PlayerShoot : NetworkBehaviour {
 		// Player default idle anim
 		else {
 			currGraphics.playIdle();
+		}
+
+		if (Input.GetKeyDown (KeyCode.Mouse1)) {
+			weaponPos.localPosition= ADSWeaponPos;
+		}
+		else if(Input.GetKeyUp(KeyCode.Mouse1)) {
+			weaponPos.localPosition= tmpWeaponPos;
 		}
 	}
 
