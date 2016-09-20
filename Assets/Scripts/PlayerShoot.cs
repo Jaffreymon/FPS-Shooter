@@ -17,7 +17,7 @@ public class PlayerShoot : NetworkBehaviour {
 	[SerializeField]
 	private Transform weaponPos;
 	private Vector3 tmpWeaponPos;
-	private Vector3 ADSWeaponPos = new Vector3 (0f, -0.4f, 0.7f);
+	private Vector3 ADSWeaponPos = new Vector3 (0f, -0.4f, 0.81f);
 
 	[SerializeField]
 	private GameObject audioSource;
@@ -49,11 +49,6 @@ public class PlayerShoot : NetworkBehaviour {
 		// Constant update on what gun the player has
 		currWeapon = weaponManager.getCurrWeapon ();
 		currGraphics = weaponManager.getCurrGraphics ();
-
-		// If Player isn't running, stop sprint anim
-		if(playerHandler.isRunning == false) {
-			currGraphics.playWalk ();
-		}
 
 		// Checks if player is reloading to prevent shooting
 		if (!currGraphics.am.IsPlaying("Reload")) {

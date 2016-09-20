@@ -15,9 +15,9 @@ public class PlayerSetup : NetworkBehaviour {
 
 	[SerializeField]
 	GameObject playerUIPrefab;
-	private GameObject playerUIInstance;
 
-	Camera sceneCamera;
+	[HideInInspector]
+	public GameObject playerUIInstance;
 
 	// Use this for initialization
 	void Start () {
@@ -29,13 +29,8 @@ public class PlayerSetup : NetworkBehaviour {
 			DisableComponents ();
 			AssignRemotePlayer ();
 		} 
-		// Sets main camera of scene false when local player joins
+		// Setup player in game
 		else {
-			sceneCamera = Camera.main;
-			if (sceneCamera != null) {
-				sceneCamera.gameObject.SetActive (false);
-			}
-
 			// Create PlayerUI Image
 			playerUIInstance = Instantiate(playerUIPrefab);
 			playerUIInstance.name = playerUIPrefab.name;
@@ -75,9 +70,7 @@ public class PlayerSetup : NetworkBehaviour {
 	void OnDisable() {
 		Destroy(playerUIInstance);	
 
-		if (sceneCamera != null) {
-			sceneCamera.gameObject.SetActive (true);
-		}
+		GameManager.instance.SetSceneCameraActive (true);
 
 		GameManager.DeRegisteredPlayer (transform.name);
 	}

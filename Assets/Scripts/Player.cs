@@ -2,6 +2,7 @@
 using UnityEngine.Networking;
 using System.Collections;
 
+[RequireComponent(typeof(PlayerSetup))]
 public class Player : NetworkBehaviour {
 	[SyncVar]
 	private bool _isDead = false;
@@ -21,14 +22,16 @@ public class Player : NetworkBehaviour {
 	private Behaviour[] disableOnDeath;
 	private bool[] wasEnable;
 
-	private RectTransform playerPos;
+	[SerializeField]
+	private GameObject[] disableGameObjectsOnDeath;
+
+	[SerializeField]
+	private GameObject deathExplosion;
+	[SerializeField]
+	private AudioClip explosionSound;
 
 	public int getHealth() {
 		return currHealth;
-	}
-
-	public void Start() {
-		playerPos = GetComponentInParent<RectTransform>();
 	}
 
 	public void Setup () {
@@ -47,10 +50,6 @@ public class Player : NetworkBehaviour {
 
 		if (Input.GetKeyDown (KeyCode.K))
 			RpcTakeDamage (20);
-
-		// Checks if player fell off the map
-		if (playerPos.position.y <= -3)
-			Die ();
 	}
 
 	[ClientRpc]
@@ -70,14 +69,32 @@ public class Player : NetworkBehaviour {
 	private void Die() {
 		isDead = true;
 
+		// Disable player controls on death
 		for (int i = 0; i < disableOnDeath.Length; i++) {
 			disableOnDeath [i].enabled = false;
 		}
+
+		// Disable player visuals on death
+		for (int i = 0; i < disableGameObjectsOnDeath.Length; i++) {
+			disableGameObjectsOnDeath[i].SetActive(false);
+		}
 	
+		// Disable player collider on death
 		Collider _col = GetComponent<Collider> ();
 		if (_col != null) {
 			_col.enabled = true;
 		}
+
+		// Player's camera transitions to main scene camera on death
+		if (isLocalPlayer) {
+			GameManager.instance.SetSceneCameraActive (true);
+			GetComponent<PlayerSetup> ().playerUIInstance.SetActive (false);
+		}
+
+
+		GameObject explosionFX = (GameObject) Instantiate (deathExplosion, transform.position, Quaternion.identity);
+		AudioSource.PlayClipAtPoint (explosionSound, transform.position);
+		Destroy (explosionFX, 3f);
 
 		Debug.Log (transform.name + " WASTED");
 
@@ -87,7 +104,6 @@ public class Player : NetworkBehaviour {
 
 	private IEnumerator Respawn () {
 		yield return new WaitForSeconds (GameManager.instance.matchingSettings.respawnTime);
-
 		SetDefaults ();
 		Transform _spawnPoint = NetworkManager.singleton.GetStartPosition ();
 		transform.position = _spawnPoint.position;
@@ -101,13 +117,29 @@ public class Player : NetworkBehaviour {
 
 		currHealth = maxHealth;
 
+		// Enables player controls
 		for (int i = 0; i < disableOnDeath.Length; i++) {
 			disableOnDeath [i].enabled = wasEnable [i];
 		}
 
+		// Enables player collider
 		Collider _col = GetComponent<Collider> ();
 		if (_col != null) {
 			_col.enabled = true;
 		}
+
+		// Enables player visuals in game
+		for (int i = 0; i < disableGameObjectsOnDeath.Length; i++) {
+			disableGameObjectsOnDeath[i].SetActive(true);
+		}
+
+		// Player's camera transitions to game on respawn
+		if (isLocalPlayer) {
+			GameManager.instance.SetSceneCameraActive (false);
+			GetComponent<PlayerSetup> ().playerUIInstance.SetActive (true);
+		}
+
+		//Resets player's ammo count on death
+		GetComponent<WeaponManager>().getCurrWeapon().clipSize = GetComponent<WeaponManager>().getCurrWeapon().getMaxClipSize();
 	}
 }
