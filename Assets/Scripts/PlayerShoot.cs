@@ -14,7 +14,12 @@ public class PlayerShoot : NetworkBehaviour {
 	private const string Player_tag = "Player";
 	[SerializeField]
 	private Camera cam;
-	[SerializeField]
+    [SerializeField]
+    private float defaultAccuracy = 0.98f, aimAccuracyOffsetRate = 0.000005f, shootAccuracyOffsetRate = 0.0009f, maxAccurarcyOffset = 0.87f, walkingAccuracyOffset = 0.025f;
+
+    // Starting accuracy of gun
+    private float currAccuracy = 0.99f, currOffsetRate = 0.005f;
+    [SerializeField]
 	private Transform weaponPos;
 	private Vector3 tmpWeaponPos;
 	private Vector3 ADSWeaponPos = new Vector3 (0f, -0.4f, 0.81f);
@@ -33,8 +38,8 @@ public class PlayerShoot : NetworkBehaviour {
 	// Boolean to watch behavior of reloading during shooting
 	private bool isShooting = false;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 		if (cam == null) {
 			Debug.LogError ("Player_Camera null reference!");
 			this.enabled = false;
@@ -55,14 +60,34 @@ public class PlayerShoot : NetworkBehaviour {
 			if (Input.GetButtonDown ("Fire1")) {
 				InvokeRepeating ("Shoot", 0f, 1f / (currWeapon.tmpRate));
 				isShooting = true;
-			} else if (Input.GetButtonUp ("Fire1")) {
+            } else if (Input.GetButtonUp ("Fire1")) {
 				CancelInvoke ("Shoot");
 				isShooting = false;
+                currAccuracy = defaultAccuracy;
 			}
 		}
 
-		// Player Reloads when magazine is not full
-		if (!isShooting && Input.GetKeyDown (KeyCode.R) && currWeapon.clipSize != currWeapon.getMaxClipSize()) {
+        // Moves gun position when player ADS
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            // gain accuracy bonus when ADS
+            currOffsetRate = aimAccuracyOffsetRate;
+            weaponPos.localPosition = ADSWeaponPos;
+        }
+        else if (Input.GetKeyUp(KeyCode.Mouse1))
+        {
+            currOffsetRate = shootAccuracyOffsetRate;
+            weaponPos.localPosition = tmpWeaponPos;
+        }
+
+        // Lower player accuracy if shooting their gun
+        if (isShooting)
+        {
+            currAccuracy = Mathf.Clamp(currAccuracy - currOffsetRate, maxAccurarcyOffset, defaultAccuracy);
+        }
+
+        // Player Reloads when magazine is not full
+        if (!isShooting && Input.GetKeyDown (KeyCode.R) && currWeapon.clipSize != currWeapon.getMaxClipSize()) {
 			weaponManager.getCurrGraphics ().playReload ();
 			currWeapon.playReloadSound (audioSource.transform.position);
 			currWeapon.clipSize = currWeapon.getMaxClipSize ();
@@ -70,25 +95,27 @@ public class PlayerShoot : NetworkBehaviour {
 			
 		// Player Movement Anims
 		if (playerHandler.isRunning) {
-			currGraphics.playSprint();
+            // Player accuracy worsens when running
+            currAccuracy = Mathf.Clamp(currAccuracy - walkingAccuracyOffset * 2, maxAccurarcyOffset - 0.02f, defaultAccuracy);
+            currGraphics.playSprint();
 		}
 		// Player walking anim
 		else if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) ||
 			Input.GetKey(KeyCode.D) ) {
-			currGraphics.playWalk ();
+            // Player accuracy is worse when walking
+            currAccuracy = Mathf.Clamp(currAccuracy - walkingAccuracyOffset, maxAccurarcyOffset, defaultAccuracy);
+            currGraphics.playWalk ();
 		} 
 		// Player default idle anim
 		else {
-			currGraphics.playIdle();
+            // Player accuracy is default when standing and not shooting
+            if(!isShooting) { currAccuracy = defaultAccuracy; }
+            currGraphics.playIdle();
 		}
 
-		if (Input.GetKeyDown (KeyCode.Mouse1)) {
-			weaponPos.localPosition= ADSWeaponPos;
-		}
-		else if(Input.GetKeyUp(KeyCode.Mouse1)) {
-			weaponPos.localPosition= tmpWeaponPos;
-		}
-	}
+        Debug.Log(currAccuracy);
+
+    }
 
 	// Called on server when player shoots
 	[Command]
@@ -121,6 +148,15 @@ public class PlayerShoot : NetworkBehaviour {
 		}
 	}
 
+    private Vector3 getRandomBulletDir(Vector3 cameraDir) {
+        // Gets random component values for new vector trajectory
+        float randomOffsetX = UnityEngine.Random.Range(-(1 - currAccuracy), 1 - currAccuracy);
+        float randomOffsetY = UnityEngine.Random.Range(-(1 - currAccuracy), 1 - currAccuracy);
+        float randomOffsetZ = UnityEngine.Random.Range(-(1 - currAccuracy), 1 - currAccuracy);
+
+        return new Vector3(cameraDir.x + randomOffsetX, cameraDir.y + randomOffsetY, cameraDir.z + randomOffsetZ);
+    }
+
 	[Client]
 	void Shoot() {
 		// Only Local player can shoot from all players on server
@@ -139,8 +175,11 @@ public class PlayerShoot : NetworkBehaviour {
 
 		RaycastHit _hit;
 
-		// Checks valid shots
-		if(Physics.Raycast(cam.transform.position, cam.transform.forward, out _hit, currWeapon.range, mask)) {
+        // Get forward vector without offset
+        Vector3 cameraDir = cam.transform.forward;
+
+        // Checks valid shots
+        if (Physics.Raycast(cam.transform.position, getRandomBulletDir(cameraDir), out _hit, currWeapon.range, mask)) {
 			if (_hit.collider.tag == Player_tag) {
 				CmdPlayerShot (_hit.collider.name, currWeapon.damage);
 			}

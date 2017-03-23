@@ -21,8 +21,7 @@ public class PlayerSetup : NetworkBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		//TODO enable cursor visibility when testing
-		//Cursor.visible = false;
+		Cursor.visible = false;
 
 		// Only non-local players loss control of other player objects
 		if (!isLocalPlayer) {

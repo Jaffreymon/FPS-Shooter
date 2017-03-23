@@ -9,17 +9,17 @@ public class Player_Controller : MonoBehaviour {
 	private float speed = walking;
 
 	[SerializeField]
-	private float lookSensitivity = 4f;
+	private float lookSensitivity = 2f;
 
 	[SerializeField]
-	private float jumpHeight = 4f;
+	private float jumpHeight = 3f;
 
 	[SerializeField]
 	private float stamina = 1f;
 	[SerializeField]
-	private float staminaUse = 0.5f;
+	private float staminaUse = 0.3f;
 	[SerializeField]
-	private float staminaRegen = 0.3f;
+	private float staminaRegen = 0.15f;
 
 	private bool isFalling = false;
 
