@@ -15,7 +15,11 @@ public class PlayerShoot : NetworkBehaviour {
 	[SerializeField]
 	private Camera cam;
     [SerializeField]
-    private float defaultAccuracy = 0.98f, aimAccuracyOffsetRate = 0.000005f, shootAccuracyOffsetRate = 0.0009f, maxAccurarcyOffset = 0.87f, walkingAccuracyOffset = 0.025f;
+    private float normalFOV;
+    private float adsFOV;
+
+    [SerializeField]
+    private float defaultAccuracy = 1f, aimAccuracyOffsetRate = 0.000005f, shootAccuracyOffsetRate = 0.0009f, maxAccurarcyOffset = 0.87f, walkingAccuracyOffset = 0.025f;
 
     // Starting accuracy of gun
     private float currAccuracy = 0.99f, currOffsetRate = 0.005f;
@@ -26,7 +30,6 @@ public class PlayerShoot : NetworkBehaviour {
 
 	[SerializeField]
 	private GameObject audioSource;
-
 	private WeaponGraphics currGraphics;
 
 	[SerializeField]
@@ -47,6 +50,8 @@ public class PlayerShoot : NetworkBehaviour {
 		weaponManager = GetComponent<WeaponManager> ();
 		currGraphics = weaponManager.getCurrGraphics ();
 		tmpWeaponPos = weaponPos.localPosition;
+        normalFOV = cam.fieldOfView;
+        adsFOV = 30f;
 	}
 
 	// Update is called once per frame
@@ -71,11 +76,13 @@ public class PlayerShoot : NetworkBehaviour {
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
             // gain accuracy bonus when ADS
+            cam.fieldOfView = adsFOV;
             currOffsetRate = aimAccuracyOffsetRate;
             weaponPos.localPosition = ADSWeaponPos;
         }
         else if (Input.GetKeyUp(KeyCode.Mouse1))
         {
+            cam.fieldOfView = normalFOV;
             currOffsetRate = shootAccuracyOffsetRate;
             weaponPos.localPosition = tmpWeaponPos;
         }
@@ -112,9 +119,7 @@ public class PlayerShoot : NetworkBehaviour {
             if(!isShooting) { currAccuracy = defaultAccuracy; }
             currGraphics.playIdle();
 		}
-
         Debug.Log(currAccuracy);
-
     }
 
 	// Called on server when player shoots
